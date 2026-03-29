@@ -521,12 +521,18 @@ hero_image: /img/place_holder_01.png
     }, { threshold: 0.1 });
     observer.observe(canvas);
 
-    // TOC show/hide on scroll (matches SuperOdometry behaviour)
-    var toc = document.querySelector('.toc');
-    var mainTitle = document.getElementById('main-title');
+})();
+</script>
+
+<!-- TOC Scroll Behavior (matches SuperOdometry index.md) -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toc = document.querySelector('.toc');
+    const mainTitle = document.getElementById('main-title');
+
     if (toc && mainTitle) {
       function checkTocVisibility() {
-        var titleRect = mainTitle.getBoundingClientRect();
+        const titleRect = mainTitle.getBoundingClientRect();
         if (titleRect.top <= 100) {
           toc.classList.add('show');
         } else {
@@ -537,41 +543,46 @@ hero_image: /img/place_holder_01.png
       checkTocVisibility();
     }
 
-    // TOC active section highlighting
-    var tocLinks = document.querySelectorAll('.toc a');
-    var trackedSections = [];
-    tocLinks.forEach(function(link) {
-      var href = link.getAttribute('href');
+    const tocLinks = document.querySelectorAll('.toc a');
+    const sections = [];
+    tocLinks.forEach(link => {
+      const href = link.getAttribute('href');
       if (href && href.startsWith('#')) {
-        var el = document.getElementById(href.substring(1));
-        if (el) trackedSections.push({ element: el, link: link });
+        const section = document.getElementById(href.substring(1));
+        if (section) sections.push({ element: section, link: link });
       }
     });
+
     function updateActiveTocLink() {
-      var scrollPosition = window.scrollY + 150;
-      var windowHeight = window.innerHeight;
-      var documentHeight = document.documentElement.scrollHeight;
-      var currentSection = null;
+      const scrollPosition = window.scrollY + 150;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      let currentSection = null;
+
       if (window.scrollY + windowHeight >= documentHeight - 50) {
-        currentSection = trackedSections[trackedSections.length - 1];
+        currentSection = sections[sections.length - 1];
       } else {
-        for (var i = 0; i < trackedSections.length; i++) {
-          var s = trackedSections[i];
-          var rect = s.element.getBoundingClientRect();
-          var sTop = rect.top + window.scrollY;
-          if (scrollPosition >= sTop && scrollPosition < sTop + rect.height) { currentSection = s; break; }
+        for (let i = 0; i < sections.length; i++) {
+          const rect = sections[i].element.getBoundingClientRect();
+          const sTop = rect.top + window.scrollY;
+          if (scrollPosition >= sTop && scrollPosition < sTop + rect.height) {
+            currentSection = sections[i];
+            break;
+          }
         }
         if (!currentSection) {
-          for (var i = trackedSections.length - 1; i >= 0; i--) {
-            var sTop2 = trackedSections[i].element.getBoundingClientRect().top + window.scrollY;
-            if (sTop2 <= scrollPosition) { currentSection = trackedSections[i]; break; }
+          for (let i = sections.length - 1; i >= 0; i--) {
+            const sTop = sections[i].element.getBoundingClientRect().top + window.scrollY;
+            if (sTop <= scrollPosition) { currentSection = sections[i]; break; }
           }
         }
       }
-      tocLinks.forEach(function(a) { a.classList.remove('active'); });
+
+      tocLinks.forEach(link => link.classList.remove('active'));
       if (currentSection) currentSection.link.classList.add('active');
     }
+
     window.addEventListener('scroll', updateActiveTocLink);
     updateActiveTocLink();
-})();
+  });
 </script>
